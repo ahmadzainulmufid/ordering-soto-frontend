@@ -69,8 +69,8 @@
                 <span class="font-label-md text-label-md">Laporan</span>
             </a>
 
-            <a href="#"
-                class="flex items-center gap-3 text-white/80 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
+            <a href="{{ route('admin.setting') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('admin/setting*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="font-label-md text-label-md">Pengaturan</span>
             </a>
