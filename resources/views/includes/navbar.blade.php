@@ -7,24 +7,24 @@
 
         <!-- Navigasi Links -->
         <div class="flex items-center gap-8">
-            <a data-nav="hero" href="{{ url('/') }}"
-                class="nav-link font-label-md text-label-md text-primary-container border-b-2 border-primary-container pb-1 transition-all">
+            <a href="{{ url('/') }}"
+                class="font-label-md text-label-md pb-1 transition-all {{ request()->is('/') ? 'text-primary-container border-b-2 border-primary-container font-bold' : 'text-on-secondary hover:text-primary-container' }}">
                 Beranda
             </a>
-            <a data-nav="menu" href="{{ url('/#menu') }}"
-                class="nav-link font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
+            <a href="{{ url('/menu') }}"
+                class="font-label-md text-label-md pb-1 transition-all {{ request()->is('menu') ? 'text-primary-container border-b-2 border-primary-container font-bold' : 'text-on-secondary hover:text-primary-container' }}">
                 Menu
             </a>
-            <a data-nav="order" href="{{ url('/#order') }}"
-                class="nav-link font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
+            <a href="{{ url('/#order') }}"
+                class="font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
                 Cara Pesan
             </a>
-            <a data-nav="lokasi" href="{{ url('/#lokasi') }}"
-                class="nav-link font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
+            <a href="{{ url('/#lokasi') }}"
+                class="font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
                 Lokasi
             </a>
-            <a data-nav="lacak" href="#"
-                class="nav-link font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
+            <a href="#"
+                class="font-label-md text-label-md text-on-secondary hover:text-primary-container pb-1 transition-all">
                 Lacak Pesanan
             </a>
         </div>
@@ -36,17 +36,5 @@
                 Pesan Sekarang
             </button>
         </div>
-    </div>
-</nav>
-
-<!-- Mobile TopNavBar -->
-<nav
-    class="bg-secondary sticky top-0 z-50 shadow-sm md:hidden flex justify-between items-center w-full px-margin-mobile py-3">
-    <div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary-container">
-        Soto Lamongan
-    </div>
-    <div class="flex items-center gap-4">
-        <span class="material-symbols-outlined text-primary-container">shopping_cart</span>
-        <span class="material-symbols-outlined text-primary-container">menu</span>
     </div>
 </nav>
