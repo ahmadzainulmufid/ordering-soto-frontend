@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>@yield('title', 'Admin Dashboard - Soto Lamongan Cak Mufid')</title>
+    <title>@yield('title', 'Owner Dashboard - Soto Lamongan Cak Mufid')</title>
 
     {{-- Asset Style & Tailwind --}}
     @include('includes.style')
@@ -21,11 +21,10 @@
     </style>
 </head>
 
-<body class="flex min-h-screen bg-background text-on-background font-body-md">
+<body class="bg-background text-on-background font-body-md min-h-screen">
 
-    <!-- Sidebar Admin Hijau -->
-    <aside
-        class="docked left-0 h-screen w-[280px] fixed bg-secondary text-on-secondary shadow-md flex flex-col py-6 z-50">
+    <!-- Sidebar Owner Hijau (Ganti w-70 jadi w-72) -->
+    <aside class="left-0 top-0 h-screen w-72 fixed bg-secondary text-on-secondary shadow-md flex flex-col py-6 z-50">
 
         <!-- Header / Brand Logo -->
         <div class="px-6 mb-8 flex items-center gap-3">
@@ -38,15 +37,15 @@
                     {{ session('user.full_name', 'Cak Mufid') }}
                 </h1>
                 <p class="font-label-sm text-label-sm text-white/80 capitalize">
-                    {{ session('user.role', 'Admin Panel') }}
+                    {{ session('user.role', 'Owner') }} Panel
                 </p>
             </div>
         </div>
 
         <!-- Navigation Links -->
         <nav class="grow space-y-1 overflow-y-auto custom-scrollbar px-2">
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('admin/dashboard*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
+            <a href="{{ route('owner.dashboard') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('owner/dashboard*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                 <span class="font-label-md text-label-md">Dashboard</span>
             </a>
@@ -69,8 +68,8 @@
                 <span class="font-label-md text-label-md">Laporan</span>
             </a>
 
-            <a href="{{ route('admin.setting') }}"
-                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('admin/setting*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
+            <a href="{{ route('owner.setting') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('owner/setting*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="font-label-md text-label-md">Pengaturan</span>
             </a>
@@ -86,15 +85,15 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="grow ml-[280px] min-h-screen flex flex-col min-w-0">
+    <!-- Main Content Area (Ganti ml-70 jadi ml-72) -->
+    <main class="ml-72 min-h-screen flex flex-col min-w-0">
 
-        <!-- TopAppBar -->
+        <!-- TopAppBar Sticky -->
         <header
-            class="docked top-0 sticky bg-surface-bright border-b border-outline-variant flex justify-between items-center px-8 py-4 w-full z-40">
+            class="top-0 sticky bg-surface-bright border-b border-outline-variant flex justify-between items-center px-8 py-4 w-full z-40">
             <div class="flex items-center gap-4">
                 <div class="flex items-center text-on-surface-variant font-label-md text-label-md">
-                    <span>Admin Panel</span>
+                    <span class="capitalize">{{ session('user.role', 'Owner') }} Panel</span>
                     <span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
                     <span class="text-primary font-bold">@yield('header_title', 'Dashboard')</span>
                 </div>

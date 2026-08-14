@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Login Admin - Soto Lamongan Joko Tingkir</title>
+    <title>Login - Soto Lamongan Joko Tingkir</title>
 
     {{-- Panggil Style & Asset --}}
     @include('includes.style')
@@ -34,7 +34,7 @@
         <form action="{{ route('login') }}" method="POST" class="p-8 space-y-6">
             @csrf
 
-            <!-- Flash Message Error (Jika Ada) -->
+            <!-- Flash Message Error -->
             @if (session('error'))
                 <div
                     class="bg-error-container text-on-error-container p-4 rounded-xl text-label-md flex items-center gap-3">

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.owner')
 
 @section('title', 'Pengaturan - Soto Lamongan Cak Mufid')
 @section('header_title', 'Pengaturan Sistem')
@@ -35,15 +35,15 @@
 
     <div class="space-y-6">
 
-        <!-- Top Sub-Menu Navigation Tabs -->
+        <!-- Sub-Menu Navigation Tabs -->
         <div class="flex items-center gap-3 border-b border-outline-variant/40 pb-4">
-            <a href="{{ route('admin.setting', ['tab' => 'staff']) }}"
+            <a href="{{ route('owner.setting', ['tab' => 'staff']) }}"
                 class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-label-md font-bold transition-all {{ request()->get('tab', 'staff') == 'staff' ? 'bg-primary-container text-on-primary-container shadow-sm' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high' }}">
                 <span class="material-symbols-outlined text-sm">badge</span>
                 Manajemen Staf
             </a>
 
-            <a href="{{ route('admin.setting', ['tab' => 'profile']) }}"
+            <a href="{{ route('owner.setting', ['tab' => 'profile']) }}"
                 class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-label-md font-bold transition-all {{ request()->get('tab') == 'profile' ? 'bg-primary-container text-on-primary-container shadow-sm' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high' }}">
                 <span class="material-symbols-outlined text-sm">storefront</span>
                 Profil Restoran
@@ -51,7 +51,7 @@
         </div>
 
         @if (request()->get('tab', 'staff') == 'staff')
-            <!-- TAB CONTENT 1: MANAJEMEN STAF -->
+            <!-- MANAJEMEN STAF -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="font-title-md text-title-md text-on-surface font-bold">Kelola Pengguna & Akses Staf</h2>
@@ -132,7 +132,7 @@
                                                 </button>
 
                                                 <!-- Form & Tombol Hapus -->
-                                                <form action="{{ route('admin.users.destroy', $user['id']) }}"
+                                                <form action="{{ route('owner.users.destroy', $user['id']) }}"
                                                     method="POST"
                                                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus staf {{ $user['full_name'] }}?');">
                                                     @csrf
@@ -162,7 +162,68 @@
                 </div>
             </div>
 
-            <!-- Modal Form Tambah Staf -->
+            <!-- FORM TAMBAH STAF BARU -->
+            <div id="addUserModal"
+                class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden transition-all duration-300">
+                <div
+                    class="bg-surface-bright rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-outline-variant/30">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-title-md text-title-md font-bold text-on-surface">Tambah Staf Baru</h3>
+                        <button onclick="closeAddUserModal()" class="p-1 hover:bg-surface-container rounded-lg">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('owner.users.store') }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block font-label-md text-xs mb-1">Nama Lengkap</label>
+                            <input type="text" name="full_name" value="{{ old('full_name') }}" required
+                                placeholder="Contoh: Budi Kasir"
+                                class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                        </div>
+
+                        <div>
+                            <label class="block font-label-md text-xs mb-1">Alamat Email</label>
+                            <input type="email" name="email" value="{{ old('email') }}" required
+                                placeholder="staf@sotocakmufid.com"
+                                class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                        </div>
+
+                        <div>
+                            <label class="block font-label-md text-xs mb-1">Nomor HP</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="081234567890"
+                                class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                        </div>
+
+                        <div>
+                            <label class="block font-label-md text-xs mb-1">Peran Akses (Role)</label>
+                            <select name="role" required
+                                class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container">
+                                <option value="cashier">Kasir (Cashier)</option>
+                                <option value="kitchen">Dapur (Kitchen)</option>
+                                <option value="admin">Admin Operasional</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-label-md text-xs mb-1">Kata Sandi Awal</label>
+                            <input type="password" name="password" required placeholder="Minimal 8 karakter"
+                                class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                        </div>
+
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" onclick="closeAddUserModal()"
+                                class="flex-1 py-3 border border-outline-variant rounded-xl font-bold">Batal</button>
+                            <button type="submit"
+                                class="flex-1 py-3 bg-primary-container text-on-primary-container font-bold rounded-xl shadow-md">Simpan
+                                Staf</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FORM EDIT DATA STAF -->
             <div id="editUserModal"
                 class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden transition-all duration-300">
                 <div
@@ -211,14 +272,14 @@
                 </div>
             </div>
         @else
-            <!-- TAB CONTENT 2: PROFIL RESTORAN -->
+            <!-- PROFIL RESTORAN -->
             <div class="tonal-layer-1 p-8 rounded-2xl border border-outline-variant/30 max-w-2xl space-y-6">
                 <div>
                     <h2 class="font-title-md text-title-md text-on-surface font-bold">Informasi Gerai Restoran</h2>
                     <p class="text-sm text-on-surface-variant">Atur informasi utama gerai yang ditampilkan pada sistem.</p>
                 </div>
 
-                <form action="{{ route('admin.setting.profile.update') }}" method="POST" class="space-y-4">
+                <form action="{{ route('owner.setting.profile.update') }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
                         <label class="block font-label-md text-xs mb-1">Nama Restoran / Gerai</label>
@@ -258,6 +319,7 @@
     </div>
 
     <script>
+        // Modal Tambah User
         function openAddUserModal() {
             document.getElementById('addUserModal').classList.remove('hidden');
         }
@@ -266,14 +328,13 @@
             document.getElementById('addUserModal').classList.add('hidden');
         }
 
-        // Fungsi Pembuka Modal Edit
+        // Modal Edit User
         function openEditUserModal(user) {
             document.getElementById('edit_full_name').value = user.full_name || '';
             document.getElementById('edit_phone').value = user.phone || '';
             document.getElementById('edit_role').value = user.role || 'cashier';
 
-            // Atur action form ke endpoint update dengan ID spesifik
-            document.getElementById('editUserForm').action = `/admin/users/${user.id}`;
+            document.getElementById('editUserForm').action = `/owner/users/${user.id}`;
 
             document.getElementById('editUserModal').classList.remove('hidden');
         }
