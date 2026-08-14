@@ -1,9 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\SettingController;
+use App\Http\Controllers\Admin\CategoryController;
+use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', fn() => view('home'))->name('home');
@@ -32,6 +33,15 @@ Route::prefix('owner')->name('owner.')->group(function () {
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', fn() => view('pages.admin.dashboard'))->name('dashboard');
+
+    // Kelola Menu
+    Route::get('/menu', fn() => view('pages.admin.kelola'))->name('menu.index');
+
+    // Kelola Category
+    Route::get('/category', [CategoryController::class, 'index'])->name('kelola.category');
+    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
+    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
 });
 
 // Cashier Routes
