@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\SettingController;
-use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -42,6 +43,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
     Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+
+    // Route Kelola Meja Makan
+    Route::get('/table', [DiningTableController::class, 'index'])->name('kelola.table');
+    Route::post('/table', [DiningTableController::class, 'store'])->name('table.store');
+    Route::put('/table/{id}', [DiningTableController::class, 'update'])->name('table.update');
+    Route::delete('/table/{id}', [DiningTableController::class, 'destroy'])->name('table.destroy');
 });
 
 // Cashier Routes

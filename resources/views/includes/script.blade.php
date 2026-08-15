@@ -176,3 +176,40 @@
         }
     });
 </script>
+
+{{-- Handler Notifikasi Dropdown & State Badge --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cek apakah user sudah pernah melihat notifikasi sebelumnya
+        const isRead = localStorage.getItem('notif_read_state');
+        const badge = document.getElementById('notifBadge');
+
+        if (isRead === 'true' && badge) {
+            badge.classList.add('hidden'); // Sembunyikan titik merah
+        }
+    });
+
+    function toggleNotificationDropdown() {
+        const dropdown = document.getElementById('notifDropdown');
+        const badge = document.getElementById('notifBadge');
+
+        // Toggle Tampilan Dropdown
+        dropdown.classList.toggle('hidden');
+
+        // Sembunyikan titik merah dan simpan status di localStorage
+        if (badge && !badge.classList.contains('hidden')) {
+            badge.classList.add('hidden');
+            localStorage.setItem('notif_read_state', 'true');
+        }
+    }
+
+    // Tutup dropdown otomatis jika klik di luar area lonceng
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notifDropdown');
+        const bellBtn = document.getElementById('notifBellBtn');
+
+        if (dropdown && bellBtn && !bellBtn.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>

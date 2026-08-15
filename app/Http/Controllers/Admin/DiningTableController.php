@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class CategoryController extends Controller
+class DiningTableController extends Controller
 {
     private string $apiUrl;
 
@@ -17,7 +17,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Helper privat untuk memastikan format Token adalah Bearer murni
+     * Helper privat untuk mengambil Token dari Session/Cookie
      */
     private function getToken()
     {
@@ -35,7 +35,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Tampilkan Halaman Daftar Kategori
+     * Tampilkan Halaman Daftar Meja Makan (Dining Table)
      */
     public function index(Request $request)
     {
@@ -43,36 +43,36 @@ class CategoryController extends Controller
             $token = $this->getToken();
 
             if (!$token) {
-                return view('pages.admin.category', ['categories' => []])
+                return view('pages.admin.table', ['tables' => []])
                     ->with('error', 'Sesi login telah habis atau token tidak ditemukan. Silakan login kembali.');
             }
 
-            // Authorization: Bearer <token>
-            $response = Http::withToken($token)->get("{$this->apiUrl}/categories");
+            // Call Go API endpoint: GET /admin/tables
+            $response = Http::withToken($token)->get("{$this->apiUrl}/admin/tables");
 
-            $categories = [];
+            $tables = [];
             if ($response->successful()) {
-                $categories = $response->json('data') ?? [];
+                $tables = $response->json('data') ?? [];
             } else {
-                session()->flash('error', $response->json('message') ?? 'Gagal mengambil data kategori.');
+                session()->flash('error', $response->json('message') ?? 'Gagal mengambil data Meja Makan.');
             }
 
-            return view('pages.admin.category', compact('categories'));
+            return view('pages.admin.table', compact('tables'));
         } catch (\Exception $e) {
-            return view('pages.admin.category', ['categories' => []])
+            return view('pages.admin.table', ['tables' => []])
                 ->with('error', 'Gagal terhubung ke server API: ' . $e->getMessage());
         }
     }
 
     /**
-     * Tambah Kategori Baru (CreateCategoryRequest DTO)
+     * Tambah Meja Makan Baru (Sesuai CreateDiningTableRequest DTO: table_number)
      */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
+            'table_number' => 'required|string|max:50',
         ], [
-            'name.required' => 'Nama kategori wajib diisi.',
+            'table_number.required' => 'Nomor meja wajib diisi.',
         ]);
 
         try {
@@ -82,22 +82,21 @@ class CategoryController extends Controller
                 return redirect()->route('login')->with('error', 'Silakan login kembali.');
             }
 
-            // Kirim request ke endpoint Go API /admin/categories
+            // Kirim payload sesuai DTO Go: {"table_number": "Meja 01"}
             $response = Http::withToken($token)
                 ->acceptJson()
-                ->post("{$this->apiUrl}/admin/categories", [
-                    'name' => $request->name,
+                ->post("{$this->apiUrl}/admin/tables", [
+                    'table_number' => $request->table_number,
                 ]);
 
             if ($response->successful()) {
-                return redirect()->route('admin.kelola.category')
-                    ->with('success', "Kategori '{$request->name}' berhasil ditambahkan.");
+                return redirect()->route('admin.kelola.table')
+                    ->with('success', "Meja '{$request->table_number}' berhasil ditambahkan.");
             }
 
-            // Ambil pesan error spesifik dari response Go API
             $errorMessage = $response->json('message') 
                 ?? $response->json('error') 
-                ?? ('Gagal menambahkan kategori (HTTP Code: ' . $response->status() . ')');
+                ?? ('Gagal menambahkan meja (HTTP Code: ' . $response->status() . ')');
 
             return redirect()->back()->with('error', $errorMessage)->withInput();
 
@@ -107,13 +106,13 @@ class CategoryController extends Controller
     }
 
     /**
-     * Perbarui Kategori (UpdateCategoryRequest DTO)
+     * Perbarui Data Meja (Sesuai UpdateDiningTableRequest DTO: table_number & is_active)
      */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'is_active' => 'required',
+            'table_number' => 'required|string|max:50',
+            'is_active'    => 'required',
         ]);
 
         try {
@@ -125,19 +124,20 @@ class CategoryController extends Controller
 
             $isActive = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
 
+            // Kirim payload sesuai DTO Go: {"table_number": "Meja 01", "is_active": true}
             $response = Http::withToken($token)
                 ->acceptJson()
-                ->put("{$this->apiUrl}/admin/categories/{$id}", [
-                    'name' => $request->name,
-                    'is_active' => $isActive,
+                ->put("{$this->apiUrl}/admin/tables/{$id}", [
+                    'table_number' => $request->table_number,
+                    'is_active'    => $isActive,
                 ]);
 
             if ($response->successful()) {
-                return redirect()->route('admin.kelola.category')
-                    ->with('success', "Kategori '{$request->name}' berhasil diperbarui.");
+                return redirect()->route('admin.kelola.table')
+                    ->with('success', "Data Meja '{$request->table_number}' berhasil diperbarui.");
             }
 
-            $errorMessage = $response->json('message') ?? 'Gagal memperbarui kategori.';
+            $errorMessage = $response->json('message') ?? 'Gagal memperbarui data meja.';
             return redirect()->back()->with('error', $errorMessage);
 
         } catch (\Exception $e) {
@@ -146,7 +146,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Hapus Kategori
+     * Hapus Meja Makan
      */
     public function destroy($id)
     {
@@ -157,16 +157,17 @@ class CategoryController extends Controller
                 return redirect()->route('login')->with('error', 'Silakan login kembali.');
             }
 
+            // Endpoint plural: /admin/tables/{id}
             $response = Http::withToken($token)
                 ->acceptJson()
-                ->delete("{$this->apiUrl}/admin/categories/{$id}");
+                ->delete("{$this->apiUrl}/admin/tables/{$id}");
 
             if ($response->successful()) {
-                return redirect()->route('admin.kelola.category')
-                    ->with('success', 'Kategori berhasil dihapus.');
+                return redirect()->route('admin.kelola.table')
+                    ->with('success', 'Meja makan berhasil dihapus.');
             }
 
-            $errorMessage = $response->json('message') ?? 'Gagal menghapus kategori.';
+            $errorMessage = $response->json('message') ?? 'Gagal menghapus meja makan.';
             return redirect()->back()->with('error', $errorMessage);
 
         } catch (\Exception $e) {
