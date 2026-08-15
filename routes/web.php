@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DiningTableController;
+use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\SettingController;
@@ -36,7 +37,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', fn() => view('pages.admin.dashboard'))->name('dashboard');
 
     // Kelola Menu
-    Route::get('/menu', fn() => view('pages.admin.kelola'))->name('menu.index');
+    Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
+    Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
+    Route::put('/menu/{id}', [MenuController::class, 'update'])->name('menu.update');
+    Route::delete('/menu/{id}', [MenuController::class, 'destroy'])->name('menu.destroy');
 
     // Kelola Category
     Route::get('/category', [CategoryController::class, 'index'])->name('kelola.category');
