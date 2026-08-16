@@ -40,14 +40,9 @@
 
         <!-- Navigation Links -->
         <nav class="grow space-y-1 overflow-y-auto custom-scrollbar px-2">
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->is('admin/dashboard*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
-                <span class="font-label-md text-label-md">Dashboard</span>
-            </a>
 
-            <a href="#"
-                class="flex items-center gap-3 text-white/80 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
+            <a href="{{ route('admin.orders.index') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->routeIs('admin.orders.*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span class="font-label-md text-label-md">Pesanan Masuk</span>
             </a>

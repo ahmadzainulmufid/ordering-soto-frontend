@@ -50,7 +50,7 @@ class AuthController extends Controller
         case 'kitchen':
             return redirect()->route('kitchen.orders')->with('success', 'Selamat bertugas, Dapur!');
         default:
-            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, Admin!');
+            return redirect()->route('admin.orders.index')->with('success', 'Selamat datang kembali, Admin!');
     }
 }
 

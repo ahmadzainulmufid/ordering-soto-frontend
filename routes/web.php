@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\MenuController;
@@ -46,8 +47,6 @@ Route::prefix('owner')->name('owner.')->group(function () {
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', fn() => view('pages.admin.dashboard'))->name('dashboard');
-
     // Kelola Menu
     Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
     Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
@@ -65,6 +64,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/table', [DiningTableController::class, 'store'])->name('table.store');
     Route::put('/table/{id}', [DiningTableController::class, 'update'])->name('table.update');
     Route::delete('/table/{id}', [DiningTableController::class, 'destroy'])->name('table.destroy');
+
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
 });
 
 // Cashier Routes
