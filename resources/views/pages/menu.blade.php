@@ -4,6 +4,20 @@
 
 @section('content')
     <div class="px-margin-desktop py-12">
+        <!-- Flash Alert Error -->
+        @if (session('error'))
+            <div
+                class="bg-red-100 text-red-800 p-4 rounded-2xl border border-red-200 flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-red-600">error</span>
+                    <p class="text-sm font-bold">{{ session('error') }}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="p-1 hover:bg-red-200 rounded-lg">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+        @endif
+
         <!-- Header Section -->
         <header class="mb-12">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
@@ -14,28 +28,31 @@
                         dapur Cak Mufid.
                     </p>
                 </div>
+                <!-- Search Input Bar -->
                 <div class="relative w-full md:w-96">
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline"
                         data-icon="search">search</span>
-                    <input
-                        class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary-container font-body-md text-body-md"
+                    <input id="searchInput" onkeyup="searchMenu()"
+                        class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary-container font-body-md text-body-md outline-none"
                         placeholder="Cari menu favorit Anda..." type="text" />
                 </div>
             </div>
 
-            <!-- Category Filters -->
-            <div class="flex flex-wrap gap-3">
-                <button
-                    class="px-6 py-2 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md font-bold shadow-sm">Semua</button>
-                <button
-                    class="px-6 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md">Soto</button>
-                <button
-                    class="px-6 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md">Makanan
-                    Tambahan</button>
-                <button
-                    class="px-6 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md">Sate</button>
-                <button
-                    class="px-6 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md">Minuman</button>
+            <!-- Category Filters Dinamis -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto custom-scrollbar pb-1 md:pb-0">
+                <button onclick="filterCategory('all')" id="tab-all"
+                    class="category-tab px-4 py-2 rounded-xl text-xs font-bold bg-primary-container text-on-primary-container shadow-sm whitespace-nowrap">
+                    Semua Menu
+                </button>
+
+                @foreach ($categories as $cat)
+                    @if (($cat['is_active'] ?? false) == true || ($cat['is_active'] ?? 0) == 1)
+                        <button onclick="filterCategory('{{ $cat['id'] }}')" id="tab-{{ $cat['id'] }}"
+                            class="category-tab px-4 py-2 rounded-xl text-xs font-bold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">
+                            {{ $cat['name'] }}
+                        </button>
+                    @endif
+                @endforeach
             </div>
         </header>
 
@@ -43,161 +60,49 @@
         <div class="grid grid-cols-12 gap-gutter">
             <!-- Left: Menu Grid (9 cols) -->
             <section class="col-span-12 lg:col-span-9">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="menuGrid">
 
-                    <!-- Menu Item 1: Soto Ayam Lamongan -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvzuQlNUY3gv4y7gdc6uWK5uDxi6Ij9AXGC9RFWTD1iOo2N8S3pV3YTIDSapdU2G719kracjsOW0s8s5We1Lpv1PSFADIsNWFbFPZBzoZP44neuK_OQW7IrhRM-5rSSBNn2q5jpbYd1Ups6FhpCvQfuatyMXceyHb_oGJ1LMVa9GyF4dO8USRek7GAwmhvJhQkM8HFERAxtPnu0n6Y8fNNeMpCTjSMNMRpawvsi9p8fu-tuFMS4iA4poShtr4jHdsq0r7624KctTRt"
-                                alt="Soto Ayam Lamongan" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Soto Ayam Lamongan</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 18.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Kuah kuning
-                                bening gurih dengan suwiran ayam kampung dan koya spesial.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
+                    @forelse ($products as $item)
+                        <!-- Hanya tampilkan produk yang is_available bernilai true / 1 -->
+                        @if (($item['is_available'] ?? false) == true || ($item['is_available'] ?? 0) == 1)
+                            <div class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col hover:shadow-md transition-shadow"
+                                data-category-id="{{ $item['category_id'] ?? '' }}"
+                                data-name="{{ strtolower($item['name'] ?? '') }}">
 
-                    <!-- Menu Item 2: Soto Ayam Spesial -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Mfd2JfNeKwy-SxdedkpKDNI1ZnndJPJe11xxyR5da7vE8lTZqJwPqlRAdfXP6SQwJoqxJ-xVwq3tjBGWBT8ierh3SnesoVnMRBpmpUtaCzMqB9gge0E9ChoAZSGm9vTzNMypEK58TD-gd2k7Eyd4p3kKJlXMo_VTjJjsT-Xk4E8v16k7eqIMdVbPC-4xc97iPjTMlik9WYM3g8oBYcpCq8AdrZev7IGGTAY9D325Swo5H47C_yKN6glwXEN1Um4NFKDXvRJ8NlKE"
-                                alt="Soto Ayam Spesial" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Soto Ayam Spesial</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 25.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Porsi lebih besar
-                                dengan tambahan telur utuh dan suwiran ayam ekstra.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
+                                <div
+                                    class="h-48 w-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                                    @if (!empty($item['image_url']))
+                                        <img class="w-full h-full object-cover" src="{{ $item['image_url'] }}"
+                                            alt="{{ $item['name'] }}" />
+                                    @else
+                                        <span class="material-symbols-outlined text-5xl text-outline/40">restaurant</span>
+                                    @endif
+                                </div>
 
-                    <!-- Menu Item 3: Soto Ayam + Nasi -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAwSldel_Rhj9F4tbbnb9QRwcZJinqZEhEJ1cHZdRSW4V1cZ9-1cuvvtgcfmI6UBw2scOhqNWi870z5sy3tfbpf2k3kgzNoDWXCKF00qSukJgOHy0krVMQ632RcbLGH367yEyNrjIYsM8H4cwLL68Pc8o8pOFzPQaH0ySNR6jJyFJxhSXXDn6aF3qD0lvQIvFSaf6k5kTm6w1R5NNYvUb_oPzIQCfNl3A7S_kZNs008azwx9nERC0A3xPA7EXa6ax3iXInxNNS5TFl"
-                                alt="Soto Ayam + Nasi" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Soto Ayam + Nasi</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 22.000</span>
+                                <div class="p-5 grow flex flex-col">
+                                    <div class="flex justify-between items-start mb-2 gap-2">
+                                        <h3 class="font-title-md text-title-md text-on-surface font-bold">
+                                            {{ $item['name'] }}</h3>
+                                        <span class="font-label-md text-label-md text-secondary font-bold shrink-0">
+                                            Rp {{ number_format($item['price'] ?? 0, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    <p class="font-body-md text-xs text-on-surface-variant mb-6 line-clamp-2">
+                                        {{ $item['description'] ?? 'Sajian gurih & lezat khas Soto Lamongan Cak Mufid.' }}
+                                    </p>
+                                    <button onclick="addToCart({{ json_encode($item) }})"
+                                        class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
+                                        <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
+                                    </button>
+                                </div>
                             </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Paket hemat Soto
-                                Ayam Lamongan lengkap dengan nasi putih hangat.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
+                        @endif
+                    @empty
+                        <div class="col-span-full text-center py-12 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-5xl mb-2 text-outline/40">soup_kitchen</span>
+                            <p class="font-bold">Tidak ada menu yang tersedia saat ini.</p>
                         </div>
-                    </div>
-
-                    <!-- Menu Item 4: Sate Usus -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlTgRnPRNvw-PaM6YEeE6bBDd4SpPlNFRcwV_FzRWIkyCr9zUBItWwuVoKZS626YrTftOeNMrLTgyMr-YOeS7rFPelVj12eRnsdgtyUAjqBFCPOSAnS7R3LaVn5WeP4YFayW4rlHYl0jeCct_288eH0KQcsCflZRHjDGxWWM-ztDOSunC0otr-3u7sZpvDo6jO5Nkoq1EfDtM6-kEa_-ff90PTW6X_yxFS61P4C3rSq55bt3Hh6jjkhPKfdxei4tHKV8ArgYn9ytmx"
-                                alt="Sate Usus" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Sate Usus</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 3.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Sate usus bumbu
-                                kecap manis gurih, pelengkap sempurna soto Anda.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Menu Item 5: Sate Telur Puyuh -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXwhgRxGpDlDY_VveaQX0RUnepXzSSBLSTeagLfObdevhPvGwyPimvL-Uha75AlmtOvBMnaEDR8xM6a762H5asZHcMqriM5ArFZC25dx4_c1dD4T5vw2eCb3szfKtaspX9Akbj19waeWx3wl4KWGc7BvmFY71d_hDWl_Ll0PbVYs7JvMesEEIcKFnw6N_dO_uM_vH8T32I023xYFmCrafLZ9_en1scs3XvKEwkw-9ZW564mCuj8DWphoAXXNRKX3JVeSCubxlJZOL7"
-                                alt="Sate Telur Puyuh" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Sate Telur Puyuh</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 4.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Telur puyuh
-                                pilihan dimasak dengan bumbu bacem tradisional.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Menu Item 6: Es Teh Manis -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWrIW0AbvuomIGaDugGZKqJifaRBAsrxzE6Em92plammVI8uar09OSNaIOH5is4F44N_4ClVEFybyWkH6cxq7fABDfqlPWTXw359XKjlUcfxtRT19Hx-ghSL_zc6LvX1dGZHoLxF8sOHagD5_IQysAC-WVlh8JftH9ZpFjQCEaCvaEFUVzhsPmx_uUEp5yZHnStsil-YRdttqFxZxan76o_grcKeD7Gy7O62m3rxnJx7LuM2d78OJMykeNYnvSghFSCZVxLkf6AXvZ"
-                                alt="Es Teh Manis" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Es Teh Manis</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 5.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Teh melati wangi
-                                disajikan dingin dengan gula murni.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Menu Item 7: Es Jeruk -->
-                    <div
-                        class="menu-card bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col">
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNAKE350axJmQVxdgyWbo3y6xxSEb7l8yJZ61DW4Z0iBkAC0pPnJ0j67OXI6ldtpc6DtMcxPiRnm4P4bp07VRZ0rwYzjkBFwOXTtp-kqivjm4ZuN_fZ7qbX4NNRXK6apEVlpBDfs-bdUE3LSo_I6x2npmaHxGkvhYm4LyWjNA3sBwr5WhH2m5OJQJLfCDj83zwUT71f6N0E9BCvPUREiwSfVyevDvkPCSko_MzDxi6UxOQj5om8lsp7LmdnWag-YJwh7eT54EK6Dog"
-                                alt="Es Jeruk" />
-                        </div>
-                        <div class="p-5 grow flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-title-md text-title-md text-on-surface">Es Jeruk</h3>
-                                <span class="font-label-md text-label-md text-secondary font-bold">Rp 8.000</span>
-                            </div>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Perasan jeruk
-                                segar murni kaya vitamin C, segar dan sehat.</p>
-                            <button
-                                class="mt-auto w-full py-3 bg-secondary text-white rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
-                                <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Tambah
-                            </button>
-                        </div>
-                    </div>
+                    @endforelse
 
                 </div>
             </section>
@@ -207,94 +112,289 @@
                 <div class="sticky top-28 bg-surface-container-high rounded-2xl p-6 shadow-md flex flex-col h-fit">
                     <div class="flex items-center gap-2 mb-6 text-primary">
                         <span class="material-symbols-outlined" data-icon="shopping_basket">shopping_basket</span>
-                        <h2 class="font-title-md text-title-md">Ringkasan Pesanan</h2>
+                        <h2 class="font-title-md text-title-md font-bold">Ringkasan Pesanan</h2>
                     </div>
 
                     <!-- Selected Items List -->
-                    <div class="space-y-4 mb-8 max-h-100 overflow-y-auto custom-scrollbar pr-2">
-                        <!-- Item 1 -->
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="grow">
-                                <h4 class="font-label-md text-label-md text-on-surface">Soto Ayam Lamongan</h4>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="remove">remove</span>
-                                    </button>
-                                    <span class="font-label-md text-label-md">1</span>
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="add">add</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <span class="font-label-md text-label-md text-on-surface whitespace-nowrap">Rp 18.000</span>
-                        </div>
-                        <!-- Item 2 -->
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="grow">
-                                <h4 class="font-label-md text-label-md text-on-surface">Sate Telur Puyuh</h4>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="remove">remove</span>
-                                    </button>
-                                    <span class="font-label-md text-label-md">2</span>
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="add">add</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <span class="font-label-md text-label-md text-on-surface whitespace-nowrap">Rp 8.000</span>
-                        </div>
-                        <!-- Item 3 -->
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="grow">
-                                <h4 class="font-label-md text-label-md text-on-surface">Es Teh Manis</h4>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="remove">remove</span>
-                                    </button>
-                                    <span class="font-label-md text-label-md">1</span>
-                                    <button
-                                        class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
-                                        <span class="material-symbols-outlined text-xs" data-icon="add">add</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <span class="font-label-md text-label-md text-on-surface whitespace-nowrap">Rp 5.000</span>
-                        </div>
+                    <div id="cartItemsList" class="space-y-4 mb-8 max-h-80 overflow-y-auto custom-scrollbar pr-2">
+                        <p id="emptyCartText" class="text-xs text-on-surface-variant italic text-center py-4">Belum ada item
+                            dipilih.</p>
                     </div>
 
                     <!-- Pricing Info -->
                     <div class="border-t border-outline-variant pt-6 space-y-3 mb-8">
                         <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
                             <span>Subtotal</span>
-                            <span>Rp 31.000</span>
+                            <span id="cartSubtotal">Rp 0</span>
                         </div>
                         <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
                             <span>Biaya Layanan</span>
-                            <span>Rp 2.000</span>
+                            <span id="cartServiceFee">Rp 2.000</span>
                         </div>
                         <div
-                            class="flex justify-between font-title-md text-title-md text-on-surface pt-2 border-t border-dashed border-outline-variant">
+                            class="flex justify-between font-title-md text-title-md text-on-surface pt-2 border-t border-dashed border-outline-variant font-bold">
                             <span>Total</span>
-                            <span class="text-secondary">Rp 33.000</span>
+                            <span class="text-secondary" id="cartTotal">Rp 0</span>
                         </div>
                     </div>
 
                     <!-- Action Button -->
-                    <button
-                        class="w-full py-4 bg-primary-container text-on-primary-container font-label-md text-label-md font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2">
-                        Lanjut ke Checkout <span class="material-symbols-outlined"
-                            data-icon="arrow_forward">arrow_forward</span>
+                    <button id="btnCheckout" onclick="openCheckoutModal()" disabled
+                        class="w-full py-4 bg-primary-container text-on-primary-container font-label-md text-label-md font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                        Lanjut ke Checkout
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
                     </button>
-                    <p class="mt-4 text-center text-xs text-on-surface-variant italic">Pesanan akan segera diproses setelah
-                        konfirmasi pembayaran.</p>
+                    <p class="mt-4 text-center text-xs text-on-surface-variant italic">
+                        Pesanan akan segera diproses setelah konfirmasi.
+                    </p>
                 </div>
             </aside>
         </div>
     </div>
+
+    <!-- MODAL FORM CHECKOUT PELANGGAN -->
+    <div id="checkoutModal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden">
+        <div class="bg-surface-bright rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-outline-variant/30">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-title-md text-title-md font-bold text-on-surface">Informasi Pemesan</h3>
+                <button onclick="closeCheckoutModal()" class="p-1 hover:bg-surface-container rounded-lg">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form id="orderForm" action="{{ route('orders.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <!-- Input JSON Items Hidden untuk Dikirim ke Backend -->
+                <input type="hidden" name="items_json" id="itemsJsonInput">
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">Nama Lengkap</label>
+                    <input type="text" name="customer_name" required placeholder="Masukkan nama Anda"
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">No. WhatsApp / Telepon</label>
+                    <input type="tel" name="customer_phone" placeholder="08123456789"
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">Tipe Pesanan</label>
+                    <select name="order_type" id="orderTypeSelect" onchange="toggleOrderFields()" required
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container">
+                        <option value="dine_in">Makan di Tempat (Dine In)</option>
+                        <option value="takeaway">Bawa Pulang (Takeaway)</option>
+                        <option value="delivery">Pesan Antar (Delivery)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">Metode Pembayaran</label>
+                    <select name="payment_method" required
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container">
+                        <option value="cash" selected>Bayar di Kasir (Tunai / Cash)</option>
+                        <option value="online_payment">Pembayaran Online</option>
+                    </select>
+                </div>
+
+                <!-- Field Nomor Meja (Tampil saat Dine In) -->
+                <div id="tableField">
+                    <label class="block text-xs font-bold mb-1">Pilih Nomor Meja</label>
+                    <select name="table_id"
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container">
+                        <option value="" disabled selected>-- Pilih Meja --</option>
+                        @forelse ($tables ?? [] as $table)
+                            @if (($table['is_active'] ?? false) == true || ($table['is_active'] ?? 0) == 1)
+                                <option value="{{ $table['id'] }}">
+                                    {{ $table['table_number'] ?? 'Meja ' . $table['id'] }}
+                                </option>
+                            @endif
+                        @empty
+                            <option value="" disabled>Belum ada meja yang terdaftar</option>
+                        @endforelse
+                    </select>
+                </div>
+
+                <!-- Field Alamat Pengiriman (Tampil saat Delivery) -->
+                <div id="addressField" class="hidden">
+                    <label class="block text-xs font-bold mb-1">Alamat Pengiriman</label>
+                    <textarea name="delivery_address" rows="2" placeholder="Alamat lengkap lokasi Anda"
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1">Catatan Pesanan (Opsional)</label>
+                    <textarea name="notes" rows="2" placeholder="Contoh: Koya dibanyakin, soto tanpa tauge"
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeCheckoutModal()"
+                        class="flex-1 py-3 border border-outline-variant rounded-xl font-bold text-sm">Batal</button>
+                    <button type="submit"
+                        class="flex-1 py-3 bg-secondary text-white font-bold text-sm rounded-xl shadow-md">Buat
+                        Pesanan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Handlers -->
+    <script>
+        let cart = [];
+        const serviceFee = 2000;
+
+        // Filter Kategori Tab
+        function filterCategory(categoryId) {
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+                tab.classList.add('bg-surface-container', 'text-on-surface-variant');
+            });
+
+            const activeTab = document.getElementById(`tab-${categoryId}`);
+            if (activeTab) {
+                activeTab.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                activeTab.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+            }
+
+            const cards = document.querySelectorAll('.menu-card');
+            cards.forEach(card => {
+                if (categoryId === 'all' || card.getAttribute('data-category-id') === String(categoryId)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Live Search Input Filter
+        function searchMenu() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.menu-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name') || '';
+                if (name.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Logika Keranjang Belanja (Cart)
+        function addToCart(product) {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    qty: 1
+                });
+            }
+            renderCart();
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsList');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const totalEl = document.getElementById('cartTotal');
+            const btnCheckout = document.getElementById('btnCheckout');
+
+            if (cart.length === 0) {
+                container.innerHTML =
+                    `<p id="emptyCartText" class="text-xs text-on-surface-variant italic text-center py-4">Belum ada item dipilih.</p>`;
+                subtotalEl.innerText = 'Rp 0';
+                totalEl.innerText = 'Rp 0';
+                btnCheckout.disabled = true;
+                btnCheckout.classList.add('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+
+            let subtotal = 0;
+            let html = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                html += `
+                <div class="flex justify-between items-start gap-4">
+                    <div class="grow">
+                        <h4 class="font-label-md text-label-md text-on-surface font-bold">${item.name}</h4>
+                        <div class="flex items-center gap-3 mt-1">
+                            <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
+                                <span class="material-symbols-outlined text-xs">remove</span>
+                            </button>
+                            <span class="font-label-md text-label-md font-bold">${item.qty}</span>
+                            <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded bg-outline-variant/30 flex items-center justify-center text-on-surface hover:bg-outline-variant/50 transition-colors">
+                                <span class="material-symbols-outlined text-xs">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <span class="font-label-md text-label-md text-on-surface whitespace-nowrap font-bold">Rp ${itemTotal.toLocaleString('id-ID')}</span>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            subtotalEl.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            totalEl.innerText = `Rp ${(subtotal + serviceFee).toLocaleString('id-ID')}`;
+
+            btnCheckout.disabled = false;
+            btnCheckout.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Modal Checkout Handlers
+        function openCheckoutModal() {
+            if (cart.length === 0) return;
+
+            // Mapping array cart ke format DTO CreateOrderItemRequest
+            const payloadItems = cart.map(item => ({
+                product_id: item.id,
+                quantity: item.qty,
+                notes: ""
+            }));
+
+            document.getElementById('itemsJsonInput').value = JSON.stringify(payloadItems);
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function toggleOrderFields() {
+            const type = document.getElementById('orderTypeSelect').value;
+            const tableField = document.getElementById('tableField');
+            const addressField = document.getElementById('addressField');
+
+            if (type === 'dine_in') {
+                tableField.classList.remove('hidden');
+                addressField.classList.add('hidden');
+            } else if (type === 'delivery') {
+                tableField.classList.add('hidden');
+                addressField.classList.remove('hidden');
+            } else {
+                tableField.classList.add('hidden');
+                addressField.classList.add('hidden');
+            }
+        }
+    </script>
 @endsection

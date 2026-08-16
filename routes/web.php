@@ -4,13 +4,19 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MenuUserController;
+use App\Http\Controllers\OrderUserController;
 use App\Http\Controllers\Owner\DashboardController;
+use App\Http\Controllers\Owner\OwnerOrderController;
+use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\Owner\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', fn() => view('home'))->name('home');
-Route::get('/menu', fn() => view('pages.menu'))->name('menu');
+Route::get('/menu', [MenuUserController::class, 'index'])->name('menu.index');
+Route::post('/orders', [OrderUserController::class, 'store'])->name('orders.store');
+Route::get('/orders/success/{code}', [OrderUserController::class, 'success'])->name('orders.success');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,6 +36,11 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::post('/users', [SettingController::class, 'storeUser'])->name('users.store');
     Route::put('/users/{id}', [SettingController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{id}', [SettingController::class, 'destroyUser'])->name('users.destroy');
+
+    Route::get('/orders', [OwnerOrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{id}/status', [OwnerOrderController::class, 'updateStatus'])->name('orders.update-status');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // Admin Routes

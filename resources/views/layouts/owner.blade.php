@@ -50,22 +50,16 @@
                 <span class="font-label-md text-label-md">Dashboard</span>
             </a>
 
-            <a href="#"
-                class="flex items-center gap-3 text-white/80 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
+            <a href="{{ route('owner.orders.index') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->routeIs('owner.orders.*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span class="font-label-md text-label-md">Pesanan Masuk</span>
             </a>
 
-            <a href="#"
-                class="flex items-center gap-3 text-white/80 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
-                <span class="material-symbols-outlined">restaurant_menu</span>
-                <span class="font-label-md text-label-md">Kelola Menu</span>
-            </a>
-
-            <a href="#"
-                class="flex items-center gap-3 text-white/80 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
+            <a href="{{ route('owner.reports.index') }}"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all group {{ request()->routeIs('owner.reports.*') ? 'bg-primary-container text-on-primary-container font-bold shadow-md translate-x-1' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                 <span class="material-symbols-outlined">analytics</span>
-                <span class="font-label-md text-label-md">Laporan</span>
+                <span class="font-label-md text-label-md">Laporan Penjualan</span>
             </a>
 
             <a href="{{ route('owner.setting') }}"
