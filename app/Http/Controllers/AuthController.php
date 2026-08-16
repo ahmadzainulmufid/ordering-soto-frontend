@@ -46,7 +46,7 @@ class AuthController extends Controller
         case 'owner':
             return redirect()->route('owner.dashboard')->with('success', 'Selamat datang kembali, Owner!');
         case 'cashier':
-            return redirect()->route('cashier.orders')->with('success', 'Selamat bertugas, Kasir!');
+            return redirect()->route('cashier.orders.index')->with('success', 'Selamat bertugas, Kasir!');
         case 'kitchen':
             return redirect()->route('kitchen.orders')->with('success', 'Selamat bertugas, Dapur!');
         default:

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Cashier\CashierOrderController;
 use App\Http\Controllers\MenuUserController;
 use App\Http\Controllers\OrderUserController;
 use App\Http\Controllers\Owner\DashboardController;
@@ -68,7 +69,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // Cashier Routes
 Route::prefix('cashier')->name('cashier.')->group(function () {
-    Route::get('/orders', fn() => view('pages.cashier.orders'))->name('orders');
+    Route::get('/orders', [CashierOrderController::class, 'index'])->name('orders.index');
+    Route::get('/menu-stock', [CashierOrderController::class, 'menuStock'])->name('menu.stock');
+    Route::post('/orders/manual', [CashierOrderController::class, 'storeManualOrder'])->name('orders.store-manual');
+    Route::patch('/orders/{id}/pay', [CashierOrderController::class, 'confirmPayment'])->name('orders.confirm-pay');
+    Route::patch('/orders/{id}/status', [CashierOrderController::class, 'updateStatus'])->name('orders.update-status');
 });
 
 // Kitchen Routes
