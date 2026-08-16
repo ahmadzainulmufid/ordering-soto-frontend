@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Cashier\CashierOrderController;
+use App\Http\Controllers\kitchen\KitchenOrderController;
 use App\Http\Controllers\MenuUserController;
 use App\Http\Controllers\OrderUserController;
 use App\Http\Controllers\Owner\DashboardController;
@@ -79,5 +80,6 @@ Route::prefix('cashier')->name('cashier.')->group(function () {
 
 // Kitchen Routes
 Route::prefix('kitchen')->name('kitchen.')->group(function () {
-    Route::get('/orders', fn() => view('pages.kitchen.orders'))->name('orders');
+    Route::get('/orders', [KitchenOrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{id}/status', [KitchenOrderController::class, 'updateStatus'])->name('orders.updateStatus');
 });
