@@ -19,7 +19,7 @@ class OrderUserController extends Controller
         $request->validate([
             'customer_name'  => 'required|string',
             'order_type'     => 'required|in:dine_in,takeaway,delivery',
-            'payment_method' => 'required|in:cash,qris,online_payment',
+            'payment_method' => 'required|in:cash,qris', 
             'items_json'     => 'required|string',
         ]);
 
@@ -28,7 +28,7 @@ class OrderUserController extends Controller
 
             $payload = [
                 'customer_name'    => $request->customer_name,
-                'customer_phone'   => $request->customer_phone ?? '',
+                'customer_phone'   => $request->customer_phone ?? '-',
                 'order_type'       => $request->order_type,
                 'table_id'         => $request->table_id ? (int) $request->table_id : null,
                 'delivery_address' => $request->delivery_address ?? '',
@@ -43,19 +43,16 @@ class OrderUserController extends Controller
             if ($response->successful()) {
                 $orderData = $response->json('data');
                 $orderCode = $orderData['order_code'] ?? '';
-                $snapToken = $orderData['snap_token'] ?? null;
 
                 return redirect()->route('orders.success', [
                     'code'           => $orderCode,
-                    'payment_method' => $request->payment_method,
-                    'snap_token'     => $snapToken
+                    'payment_method' => $request->payment_method
                 ]);
             }
 
-            // Ambil detail error dari API Go untuk ditampilkan di alert Laravel
             $errorMessage = $response->json('message') 
                 ?? $response->json('error') 
-                ?? ('API Error (HTTP ' . $response->status() . '): ' . $response->body());
+                ?? ('Gagal membuat pesanan (HTTP ' . $response->status() . ')');
 
             return redirect()->back()->with('error', $errorMessage);
 
@@ -69,12 +66,10 @@ class OrderUserController extends Controller
         $response = Http::get("{$this->apiUrl}/orders/code/{$code}");
         $order = $response->successful() ? $response->json('data') : null;
         
-        $snapToken = $request->query('snap_token');
-        
         if ($order && empty($order['payment_method'])) {
-            $order['payment_method'] = $request->query('payment_method');
+            $order['payment_method'] = $request->query('payment_method', 'cash');
         }
 
-        return view('pages.order_success', compact('order', 'code', 'snapToken'));
+        return view('pages.order_success', compact('order', 'code'));
     }
 }

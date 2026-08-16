@@ -98,13 +98,13 @@ class CashierOrderController extends Controller
         try {
             $token = $this->getToken();
 
-            // Di Go tidak ada /pay, jadi langsung update status ke 'confirmed' lewat endpoint /:id/status
             $response = Http::withToken($token)->patch("{$this->apiUrl}/admin/orders/{$id}/status", [
-                'status' => 'confirmed'
+                'status'         => 'confirmed',
+                'payment_status' => 'paid',
             ]);
 
             if ($response->successful()) {
-                return redirect()->back()->with('success', 'Pembayaran tunai disetujui, pesanan dikonfirmasi!');
+                return redirect()->back()->with('success', 'Pembayaran tunai disetujui dan status diubah menjadi PAID!');
             }
 
             $errorMessage = $response->json('message') ?? 'Gagal mengonfirmasi pembayaran (HTTP ' . $response->status() . ')';

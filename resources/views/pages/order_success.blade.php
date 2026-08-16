@@ -26,6 +26,10 @@
             @if ($order)
                 @php
                     $paymentMethod = strtolower($order['payment_method'] ?? request('payment_method', 'cash'));
+                    $orderType = strtolower($order['order_type'] ?? 'dine_in');
+                    $paymentStatus = strtolower($order['payment_status'] ?? 'unpaid');
+                    $isOnlinePayment = in_array($paymentMethod, ['qris', 'online_payment']);
+                    $snapToken = $order['snap_token'] ?? null;
                 @endphp
 
                 <!-- Rincian Pesanan -->
@@ -36,23 +40,33 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-on-surface-variant">Tipe Pesanan:</span>
-                        <span
-                            class="font-bold uppercase text-on-surface">{{ str_replace('_', ' ', $order['order_type']) }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-on-surface-variant">Metode Pembayaran:</span>
-                        <span class="font-bold uppercase text-primary">
-                            @if ($paymentMethod === 'online_payment')
-                                MIDTRANS (ONLINE PAYMENT)
-                            @else
-                                BAYAR DI KASIR (CASH)
+                        <span class="font-bold uppercase text-on-surface">
+                            {{ str_replace('_', ' ', $orderType) }}
+                            @if ($orderType === 'dine_in' && !empty($order['table_id']))
+                                (Meja {{ $order['table_id'] }})
                             @endif
                         </span>
                     </div>
+
+                    @if ($orderType === 'delivery' && !empty($order['delivery_address']))
+                        <div class="flex justify-between">
+                            <span class="text-on-surface-variant">Alamat Antar:</span>
+                            <span
+                                class="font-bold text-on-surface text-right max-w-[200px]">{{ $order['delivery_address'] }}</span>
+                        </div>
+                    @endif
+
                     <div class="flex justify-between">
-                        <span class="text-on-surface-variant">Status Pesanan:</span>
-                        <span class="px-2 py-0.5 rounded-md font-bold bg-yellow-100 text-yellow-800 uppercase text-[10px]">
-                            {{ $order['status'] ?? 'PENDING' }}
+                        <span class="text-on-surface-variant">Metode Pembayaran:</span>
+                        <span class="font-bold uppercase text-primary">
+                            {{ $isOnlinePayment ? 'QRIS / MIDTRANS ONLINE' : 'TUNAI / BAYAR DI KASIR' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">Status Pembayaran:</span>
+                        <span id="paymentStatusBadge"
+                            class="px-2 py-0.5 rounded-md font-bold uppercase text-[10px] {{ $paymentStatus === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                            {{ $paymentStatus === 'paid' ? 'PAID (Lunas)' : 'UNPAID (Menunggu Pembayaran)' }}
                         </span>
                     </div>
                     <div
@@ -62,35 +76,57 @@
                     </div>
                 </div>
 
-                <!-- OPSI PEMBAYARAN ONLINE MIDTRANS -->
-                @if ($paymentMethod === 'online_payment')
+                <!-- PETUNJUK PEMBAYARAN SESUAI METODE -->
+                @if ($isOnlinePayment && $paymentStatus !== 'paid')
+                    <!-- Pembayaran Online via Midtrans Snap -->
                     <div
-                        class="p-5 bg-primary-container/20 border border-primary/30 rounded-2xl text-xs mb-6 text-left flex flex-col gap-3">
-                        <div class="flex items-center gap-2 font-bold text-sm text-primary">
-                            <span class="material-symbols-outlined">credit_card</span>
-                            <span>Pembayaran Online via Midtrans</span>
-                        </div>
-                        <p class="text-on-surface-variant">
-                            Klik tombol di bawah untuk membayar menggunakan <strong>QRIS, GoPay, ShopeePay, Virtual Account
-                                (BCA, Mandiri, BRI)</strong>, atau Kartu Kredit.
+                        class="p-5 bg-primary-container/10 border border-primary/30 rounded-2xl text-xs mb-6 text-center space-y-3">
+                        <p class="font-bold text-primary text-sm">Pembayaran Online</p>
+                        <p class="text-[11px] text-on-surface-variant">
+                            Klik tombol di bawah untuk membuka halaman pembayaran QRIS / e-wallet / transfer bank via
+                            Midtrans.
                         </p>
 
-                        <button id="pay-button"
-                            class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-sm">lock</span> Bayar Sekarang (Midtrans)
-                        </button>
+                        @if ($snapToken)
+                            <button id="btnPayNow" type="button"
+                                class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 text-xs">
+                                <span class="material-symbols-outlined text-sm">qr_code_2</span>
+                                Bayar Sekarang
+                            </button>
+                            <p id="paymentPendingNote" class="text-[10px] text-on-surface-variant italic">
+                                Belum bayar? Klik tombol di atas kapan saja sebelum meninggalkan halaman ini.
+                            </p>
+                        @else
+                            <p class="text-[11px] text-red-600 font-bold">
+                                Token pembayaran tidak tersedia. Silakan hubungi kasir untuk verifikasi manual.
+                            </p>
+                        @endif
                     </div>
-
-                    <!-- OPSI DEFAULT: BAYAR DI KASIR -->
+                @elseif($isOnlinePayment && $paymentStatus === 'paid')
+                    <div class="p-4 bg-green-50 text-green-800 rounded-xl text-xs mb-6 flex gap-3 items-start">
+                        <span class="material-symbols-outlined text-green-600 shrink-0">check_circle</span>
+                        <p>Pembayaran Anda sudah kami terima. Terima kasih!</p>
+                    </div>
                 @else
+                    <!-- Petunjuk Tunai / Cash -->
                     <div
                         class="p-4 bg-secondary-container/30 text-on-secondary-container rounded-xl text-xs mb-6 text-left flex gap-3 items-start">
                         <span class="material-symbols-outlined text-secondary shrink-0">info</span>
-                        <p>Tunjukkan <strong>Kode Pesanan</strong> ini ke kasir untuk melakukan pembayaran secara langsung.
-                        </p>
+                        <div>
+                            @if ($orderType === 'dine_in')
+                                <p>Tunjukkan <strong>Kode Pesanan</strong> ini ke kasir saat Anda selesai makan untuk
+                                    melakukan pembayaran.</p>
+                            @elseif($orderType === 'takeaway')
+                                <p>Silakan menuju ke area kasir dan tunjukkan Kode Pesanan ini untuk membayar & mengambil
+                                    pesanan bungkus Anda.</p>
+                            @else
+                                <p>Siapkan uang pas sebesar <strong>Rp
+                                        {{ number_format($order['total'] ?? 0, 0, ',', '.') }}</strong> untuk dibayarkan
+                                    langsung kepada kurir saat pesanan sampai.</p>
+                            @endif
+                        </div>
                     </div>
                 @endif
-
             @endif
 
             <a href="{{ route('menu.index') }}"
@@ -100,32 +136,32 @@
         </div>
     </div>
 
-    <!-- Integration Midtrans Snap JS -->
-    @if (isset($snapToken) && $snapToken != '')
-        <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+    @if ($order && ($order['snap_token'] ?? null) && strtolower($order['payment_status'] ?? 'unpaid') !== 'paid')
+        <script src="https://app.{{ config('services.midtrans.is_production') ? '' : 'sandbox.' }}midtrans.com/snap/snap.js"
             data-client-key="{{ config('services.midtrans.client_key') }}"></script>
-        <script type="text/javascript">
-            const payButton = document.getElementById('pay-button');
-            if (payButton) {
-                payButton.onclick = function() {
-                    snap.pay('{{ $snapToken }}', {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.getElementById('btnPayNow');
+                if (!btn) return;
+
+                btn.addEventListener('click', function() {
+                    snap.pay('{{ $order['snap_token'] }}', {
                         onSuccess: function(result) {
-                            alert('Pembayaran berhasil!');
-                            location.reload();
+                            window.location.reload();
                         },
                         onPending: function(result) {
-                            alert('Menunggu pembayaran Anda.');
-                            location.reload();
+                            alert(
+                            'Pembayaran sedang diproses. Silakan selesaikan pembayaran Anda.');
                         },
                         onError: function(result) {
-                            alert('Pembayaran gagal atau dibatalkan.');
+                            alert('Pembayaran gagal. Silakan coba lagi atau hubungi kasir.');
                         },
                         onClose: function() {
-                            alert('Anda menutup jendela pembayaran sebelum menyelesaikan transaksi.');
+                            // User menutup popup tanpa menyelesaikan pembayaran
                         }
                     });
-                };
-            }
+                });
+            });
         </script>
     @endif
 @endsection

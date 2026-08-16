@@ -154,16 +154,21 @@
 
     <!-- MODAL FORM CHECKOUT PELANGGAN -->
     <div id="checkoutModal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden">
-        <div class="bg-surface-bright rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-outline-variant/30">
-            <div class="flex justify-between items-center mb-4">
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden p-4 overflow-y-auto">
+        <div
+            class="bg-surface-bright rounded-2xl p-6 max-w-md w-full my-auto shadow-2xl border border-outline-variant/30 max-h-[90vh] flex flex-col">
+
+            <!-- Modal Header (Fixed) -->
+            <div class="flex justify-between items-center mb-4 shrink-0">
                 <h3 class="font-title-md text-title-md font-bold text-on-surface">Informasi Pemesan</h3>
                 <button onclick="closeCheckoutModal()" class="p-1 hover:bg-surface-container rounded-lg">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
 
-            <form id="orderForm" action="{{ route('orders.store') }}" method="POST" class="space-y-4">
+            <!-- Form Body (Scrollable) -->
+            <form id="orderForm" action="{{ route('orders.store') }}" method="POST"
+                class="space-y-4 overflow-y-auto pr-1 custom-scrollbar">
                 @csrf
                 <!-- Input JSON Items Hidden untuk Dikirim ke Backend -->
                 <input type="hidden" name="items_json" id="itemsJsonInput">
@@ -192,11 +197,24 @@
 
                 <div>
                     <label class="block text-xs font-bold mb-1">Metode Pembayaran</label>
-                    <select name="payment_method" required
-                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container">
+                    <select name="payment_method" id="userPaymentMethod" onchange="togglePaymentInstructions()" required
+                        class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container font-bold">
                         <option value="cash" selected>Bayar di Kasir (Tunai / Cash)</option>
-                        <option value="online_payment">Pembayaran Online</option>
+                        <option value="qris">QRIS / E-Wallet / Transfer Bank (Midtrans Online)</option>
                     </select>
+                </div>
+
+                <div id="qrisInfoBox"
+                    class="hidden p-3 bg-primary-container/20 border border-primary/30 rounded-xl text-xs space-y-2">
+                    <div class="flex items-center gap-2 font-bold text-primary">
+                        <span class="material-symbols-outlined text-base">qr_code_2</span>
+                        <span>Pembayaran Online via Midtrans</span>
+                    </div>
+                    <p class="text-on-surface-variant text-[11px]">
+                        Setelah pesanan dibuat, Anda akan diarahkan ke halaman konfirmasi berisi tombol
+                        <strong>"Bayar Sekarang"</strong>. Klik tombol tersebut untuk membuka jendela pembayaran Midtrans
+                        (QRIS, GoPay, OVO, Dana, ShopeePay, atau Virtual Account Bank).
+                    </p>
                 </div>
 
                 <!-- Field Nomor Meja (Tampil saat Dine In) -->
@@ -230,7 +248,7 @@
                         class="w-full p-3 bg-surface-container rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-container"></textarea>
                 </div>
 
-                <div class="flex gap-3 pt-2">
+                <div class="flex gap-3 pt-2 sticky bottom-0 bg-surface-bright pb-1">
                     <button type="button" onclick="closeCheckoutModal()"
                         class="flex-1 py-3 border border-outline-variant rounded-xl font-bold text-sm">Batal</button>
                     <button type="submit"
@@ -394,6 +412,25 @@
             } else {
                 tableField.classList.add('hidden');
                 addressField.classList.add('hidden');
+            }
+        }
+
+        function togglePaymentInstructions() {
+            const method = document.getElementById('userPaymentMethod').value;
+            const qrisBox = document.getElementById('qrisInfoBox');
+            const orderForm = document.getElementById('orderForm');
+
+            if (method === 'qris') {
+                qrisBox.classList.remove('hidden');
+                // Auto scroll ke bawah di dalam form setelah info QRIS muncul
+                setTimeout(() => {
+                    orderForm.scrollTo({
+                        top: orderForm.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            } else {
+                qrisBox.classList.add('hidden');
             }
         }
     </script>
