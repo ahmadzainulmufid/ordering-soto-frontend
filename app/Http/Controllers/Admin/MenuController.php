@@ -64,8 +64,7 @@ class MenuController extends Controller
 
             $imageUrl = '';
             if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('products', 'public');
-                $imageUrl = asset('storage/' . $path);
+                $imageUrl = $this->uploadImage($token, $request->file('image'));
             }
 
             $response = Http::withToken($token)
@@ -113,8 +112,7 @@ class MenuController extends Controller
 
             $imageUrl = $request->old_image_url ?? '';
             if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('products', 'public');
-                $imageUrl = asset('storage/' . $path);
+                $imageUrl = $this->uploadImage($token, $request->file('image'));
             }
 
             $response = Http::withToken($token)
@@ -162,5 +160,34 @@ class MenuController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    private function uploadImage(string $token, $file): string
+    {
+        $response = Http::withToken($token)
+            ->acceptJson()
+            ->timeout(30)
+            ->attach(
+                'image',
+                file_get_contents($file->getRealPath()),
+                $file->getClientOriginalName()
+            )
+            ->post("{$this->apiUrl}/admin/upload/image");
+
+        if (!$response->successful()) {
+            throw new \Exception(
+                $response->json('message') ?? 'Gagal mengunggah gambar.'
+            );
+        }
+
+        $url = $response->json('data.image_url') ?? '';
+
+        if ($url === '') {
+            throw new \Exception('Upload gambar gagal: URL kosong dari server.');
+        }
+
+        return $url;
+
+        return $response->json('data.image_url') ?? '';
     }
 }
